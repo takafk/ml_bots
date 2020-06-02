@@ -1,0 +1,3 @@
+ccxt
+mpl_finance
+optuna
