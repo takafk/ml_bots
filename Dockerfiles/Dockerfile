@@ -1,36 +1,19 @@
-FROM debian:buster-slim
+FROM jupyter/datascience-notebook:latest
 
-ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+# Node js
+USER root
+RUN apt-get update && apt-get install -y sudo && \
+    sudo apt install -y nodejs npm && conda update -n base conda
 
-RUN apt-get update --fix-missing && \
-    apt-get install -y wget bzip2 ca-certificates libglib2.0-0 libxext6 libsm6 libxrender1 git mercurial subversion gcc make && \
-    apt-get clean
+# Install additional packages
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
 
-# Obtain anaconda
-RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-2019.07-Linux-x86_64.sh -O ~/anaconda.sh && \
-    /bin/bash ~/anaconda.sh -b -p /opt/conda && \
-    rm ~/anaconda.sh && \
-    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
-    echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    echo "conda activate base" >> ~/.bashrc && \
-    find /opt/conda/ -follow -type f -name '*.a' -delete && \
-    find /opt/conda/ -follow -type f -name '*.js.map' -delete && \
-    /opt/conda/bin/conda clean -afy
+## JupyterLab
+RUN jupyter labextension install @lckr/jupyterlab_variableinspector \
+    && jupyter labextension install jupyterlab-flake8
 
-# Obtain others
-RUN wget --quiet http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz -O ~/ta-lib-0.4.0-src.tar.gz && \
-    tar xvf ~/ta-lib-0.4.0-src.tar.gz && \
-    cd ta-lib && \
-    ./configure --prefix=/usr && \
-    make && make install
-SHELL ["/bin/bash", "-l", "-c"]
-
-# pythonのパッケージをインストール
-COPY requirements.txt ./
-RUN pip install -r requirements.txt && \
-    /opt/conda/bin/conda install jupyter -y --quiet && /opt/conda/bin/conda install -c anaconda py-xgboost -y --quiet
-
-ADD docker-entrypoint.sh ./
-RUN ["chmod", "+x", "/docker-entrypoint.sh"]
-EXPOSE 8888
-ENTRYPOINT ["/docker-entrypoint.sh"]
+RUN jupyter labextension install @ryantam626/jupyterlab_code_formatter@1.2.0 \
+    && jupyter serverextension enable --py jupyterlab_code_formatter \
+    && jupyter labextension install @jupyterlab/toc \
+    && jupyter labextension install jupyterlab-flake8

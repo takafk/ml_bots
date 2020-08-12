@@ -1,3 +1,23 @@
+urllib3
+# Coding
+flake8
+# Investment
 ccxt
-mpl_finance
+investpy>=0.9.14
+empyrical
+pyfolio
+ta
+# Machine learning
+scikit-learn>=0.23.2
+torch>=1.6.0
+torchvision
+imbalanced-learn
 optuna
+lightgbm
+hiplot
+# Jupyter notebook
+jupyterlab>=2.0.0
+autopep8
+black==18.9b0
+yapf
+jupyterlab_code_formatter
