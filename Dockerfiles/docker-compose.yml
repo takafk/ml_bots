@@ -8,5 +8,5 @@ services:
     ports:
       - "8888:8888"
     volumes:
-      - ~/crypto_bot:/home/jovyan/work
+      - ~/ml_bots:/home/jovyan/work
     command: start.sh jupyter lab --NotebookApp.token=''

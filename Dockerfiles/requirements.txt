@@ -1,7 +1,11 @@
 urllib3
 # Coding
 flake8
-# Investment
+autopep8
+black
+yapf
+prefect[all_extras]
+# Quantitative Investment
 ccxt
 investpy>=0.9.14
 empyrical
@@ -17,7 +21,4 @@ lightgbm
 hiplot
 # Jupyter notebook
 jupyterlab>=2.0.0
-autopep8
-black==18.9b0
-yapf
 jupyterlab_code_formatter

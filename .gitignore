@@ -1,1 +1,6 @@
 /local_disks/
+__pycache__/
+.ipynb_checkpoints/
+
+# mypy
+.mypy_cache/

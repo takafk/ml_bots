@@ -1,13 +1,17 @@
 FROM jupyter/datascience-notebook:latest
 
 # Node js
-USER root
-RUN apt-get update && apt-get install -y sudo && \
-    sudo apt install -y nodejs npm && conda update -n base conda
+USER jovyan
+RUN conda update -n base conda
+#ENV PATH $PATH:/home/jovyan/work/src/
+#RUN echo $PATH
+ENV PYTHONPATH "${PYTONPATH}:/home/jovyan/work/src/"
 
 # Install additional packages
+
 COPY requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
+RUN  fix-permissions $CONDA_DIR && fix-permissions /home/$NB_USER
+RUN pip install --requirement /tmp/requirements.txt
 
 ## JupyterLab
 RUN jupyter labextension install @lckr/jupyterlab_variableinspector \
