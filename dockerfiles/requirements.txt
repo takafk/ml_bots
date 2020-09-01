@@ -1,15 +1,19 @@
 urllib3
 # Coding
-flake8
+pytest
+pycodestyle>=2.6.0
+flake8==3.7.9
 autopep8
-black
+black==19.10b0
 yapf
+# Pipeline
 prefect[all_extras]
+graphviz
 # Quantitative Investment
 ccxt
 investpy>=0.9.14
 empyrical
-pyfolio
+#pyfolio
 ta
 # Machine learning
 scikit-learn>=0.23.2

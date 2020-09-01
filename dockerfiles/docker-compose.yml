@@ -2,11 +2,18 @@ version: "3.7"
 services:
   jupyterlab:
     build: .
-    container_name: jupyterlab
+    user: root
+    container_name: ml_bots_base
+    env_file:
+      - .env
     environment:
-      - JUPYTER_ENABLE_LAB=yes
+      JUPYTER_ENABLE_LAB: "yes"
+      GRANT_SUDO: "yes"
+      CHOWN_HOME: "yes"
+      CHOWN_EXTRA_OPTS: -R
     ports:
       - "8888:8888"
     volumes:
-      - ~/ml_bots:/home/jovyan/work
+      - ~/ml_bots:/home/$NB_USER/work
+    working_dir: /home/$NB_USER
     command: start.sh jupyter lab --NotebookApp.token=''
