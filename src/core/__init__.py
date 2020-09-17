@@ -1,2 +1,3 @@
 # flake8: noqa
-from .tasks import *
+from .tasks import DataTask
+from .compute import Compute
