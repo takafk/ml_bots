@@ -1,0 +1,85 @@
+from typing import Dict, List, Union
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+
+from prefect import task
+from prefect.engine.results import LocalResult
+
+import lib.compute_pipes as cp
+
+CURRENT = LocalResult(dir="./datastore/")
+
+
+@task(checkpoint=True, target="feature/{dfmeta[1]}/{feature_pipes}.pkl", result=CURRENT)
+def generate_features_byassets(
+    dfmeta: Dict[pd.DataFrame, str], feature_pipes: List[str]
+):
+    """Generate features for each symbols.
+
+    Args:
+        dfmeta (Dict[pd.DataFrame, str]): [description]
+        feature_pipes (List[str]): Feature pipeline defined in lib.compute_pipes
+
+    Returns:
+        pd.DataFrame: Dataframe of features for single asset.
+
+    Note:
+        - We allow many NaNs at this moment. We treat them in creating examples later.
+    """
+
+    df = dfmeta[0]
+    symbol_name = dfmeta[1]
+
+    results = []
+    for pipe in feature_pipes:
+
+        pipe_cls = getattr(cp, pipe)()
+
+        pipe_cls.dfmeta = (df, {"symbol": symbol_name})
+
+        feature: Union[pd.DataFrame, pd.Series] = pipe_cls.compute()
+
+        results.append(feature)
+
+    features = pd.concat(results, axis=1)
+
+    return features
+
+
+@task(
+    checkpoint=True, target="features/{parameters[feature_pipes]}.pkl", result=CURRENT
+)
+def create_features(feature_byassets: List[pd.DataFrame]):
+
+    result = []
+
+    for feature in feature_byassets:
+
+        result.append(feature)
+
+    df = pd.concat(result, axis=0)
+
+    df.index = [df.index, df["symbol"]]
+
+    # Categorical to number
+    cat_features = df.select_dtypes(include=object)
+
+    df.loc[:, cat_features.columns] = cat_features.apply(_cat_to_num)
+
+    df = df.sort_index(level=0)
+
+    # Remove columns with inf.
+    inf_col = df.describe().apply(lambda x: np.isinf(x.values).sum())
+    df = df.loc[:, inf_col[(inf_col == 0)].index]
+
+    return df
+
+
+def _cat_to_num(x: pd.Series) -> np.array:
+
+    le = LabelEncoder()
+
+    le = le.fit(x.values)
+
+    return le.transform(x)

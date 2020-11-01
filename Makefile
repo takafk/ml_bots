@@ -6,7 +6,7 @@ run:
 
 # Remove all containers
 rm:
-	docker rm -f $(docker ps -q -a)
+	@docker rm -f `docker ps -aq`
 
 # Enter in the container
 note:

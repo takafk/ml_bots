@@ -1,15 +1,13 @@
 FROM jupyter/datascience-notebook:latest
 
-# USER jovyan
 USER root
-# ENV PYTHONPATH "/home/jovyan/work/src/"
-RUN echo "export PYTHONPATH="/home/jovyan/work/src/:/home/$NB_USER/work/local_disk/"" >> /home/$NB_USER/.bashrc
+ENV PYTHONPATH "/home/jovyan/work/src/:/home/$NB_USER/work/local_disks/"
 # apt-get with sudo. First line is to avoid the error: sudo: setrlimit(RLIMIT_CORE)
 RUN echo "Set disable_coredump false" >> /etc/sudo.conf
 RUN sudo apt-get update && sudo apt-get install graphviz -y wget \
     && sudo apt-get install vim -y wget
 
-# Install additional packages (to store cache, we do on jovyan.)
+# Install additional packages (to store cache, we do it on $NB_USER.)
 USER $NB_USER
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --requirement /tmp/requirements.txt \
