@@ -7,9 +7,13 @@ from prefect.engine.results import LocalResult
 CURRENT = LocalResult(dir="./datastore/")
 
 
-@task(checkpoint=True, target="examples/examples_{hash_value}.pkl", result=CURRENT)
+@task(
+    checkpoint=True,
+    target="examples/examples_{parameters[hash_value]}.pkl",
+    result=CURRENT,
+)
 def post_label_transform(
-    selected_examples: pd.DataFrame, hash_value: int, is_classification: bool = True
+    selected_examples: pd.DataFrame, is_classification: bool = True
 ) -> pd.DataFrame:
 
     if is_classification:

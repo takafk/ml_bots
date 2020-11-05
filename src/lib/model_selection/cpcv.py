@@ -48,7 +48,7 @@ class CPCV:
         for test_fold_bound in test_folds_bound:
 
             test_indices = np.union1d(
-                test_indices, indices[test_fold_bound[0]:test_fold_bound[-1]]
+                test_indices, indices[test_fold_bound[0] : test_fold_bound[-1]]
             ).astype(int)
 
         return test_indices

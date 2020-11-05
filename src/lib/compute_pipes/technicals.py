@@ -45,7 +45,7 @@ def add_all_ta_without_leak(
         "trend_visual_ichimoku_a",
         "trend_visual_ichimoku_b",
         "others_dr",
-        'volume_vpt',
+        "volume_vpt",
     ]
 
     deny_cols = features.columns.isin(
@@ -56,7 +56,7 @@ def add_all_ta_without_leak(
     return features.loc[:, features.columns[features.isnull().sum() >= max_nan]]
 
 
-@ dataclass
+@dataclass
 class All_Technicals(Compute):
 
     window: int = field(default=63)
@@ -82,18 +82,16 @@ class All_Technicals(Compute):
 
         # Normalization and Treatment for extreme value
         normed_features = features.apply(
-            lambda x: (x.rolling(self.window).mean() - x) /
-            x.rolling(self.window).std()
+            lambda x: (x.rolling(self.window).mean() - x) / x.rolling(self.window).std()
         )
         normed_features = normed_features.apply(
-            lambda x: x.clip(x.quantile(self.quantile),
-                             x.quantile(1 - self.quantile))
+            lambda x: x.clip(x.quantile(self.quantile), x.quantile(1 - self.quantile))
         )
 
         return normed_features
 
 
-@ dataclass
+@dataclass
 class AllTechnicals_WithVol(Compute):
 
     window: int = field(default=63)
@@ -121,8 +119,7 @@ class AllTechnicals_WithVol(Compute):
             # zscored_features = features.apply(lambda x: (x.rolling(self.window).mean() - x) / x.rolling(self.window).apply(lambda x: x.quantile(0.75) - x.quantile(0.25)))
 
             zscored_features = features.apply(
-                lambda x: (x.mean() - x) /
-                (x.quantile(0.75) - x.quantile(0.25))
+                lambda x: (x.mean() - x) / (x.quantile(0.75) - x.quantile(0.25))
             )
             features = zscored_features.apply(
                 lambda x: x.clip(

@@ -1,24 +1,28 @@
-from typing import Dict, List, Union
+from typing import Tuple, List, Union, Any
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
+import prefect
 from prefect import task
 from prefect.engine.results import LocalResult
 
-import lib.compute_pipes as cp
 
 CURRENT = LocalResult(dir="./datastore/")
 
 
-@task(checkpoint=True, target="feature/{dfmeta[1]}/{feature_pipes}.pkl", result=CURRENT)
+@task(
+    checkpoint=True,
+    target="feature/{dfmeta[1]}/{parameters[hash_value_features]}.pkl",
+    result=CURRENT,
+)
 def generate_features_byassets(
-    dfmeta: Dict[pd.DataFrame, str], feature_pipes: List[str]
+    dfmeta: Tuple[pd.DataFrame, str], feature_pipes: List[Any]
 ):
     """Generate features for each symbols.
 
     Args:
-        dfmeta (Dict[pd.DataFrame, str]): [description]
+        dfmeta (Tuple[pd.DataFrame, str]): Dict of dataframe of all data used for creating feature and symbol.
         feature_pipes (List[str]): Feature pipeline defined in lib.compute_pipes
 
     Returns:
@@ -32,9 +36,7 @@ def generate_features_byassets(
     symbol_name = dfmeta[1]
 
     results = []
-    for pipe in feature_pipes:
-
-        pipe_cls = getattr(cp, pipe)()
+    for pipe_cls in feature_pipes:
 
         pipe_cls.dfmeta = (df, {"symbol": symbol_name})
 
@@ -48,9 +50,15 @@ def generate_features_byassets(
 
 
 @task(
-    checkpoint=True, target="features/{parameters[feature_pipes]}.pkl", result=CURRENT
+    checkpoint=True,
+    target="features/{parameters[symbols]}_{parameters[hash_value_features]}.pkl",
+    result=CURRENT,
 )
 def create_features(feature_byassets: List[pd.DataFrame]):
+
+    logger = prefect.context.get("logger")
+
+    logger.info("Start to create featrues.")
 
     result = []
 
@@ -72,6 +80,8 @@ def create_features(feature_byassets: List[pd.DataFrame]):
     # Remove columns with inf.
     inf_col = df.describe().apply(lambda x: np.isinf(x.values).sum())
     df = df.loc[:, inf_col[(inf_col == 0)].index]
+
+    logger.info("End of creating featrues.")
 
     return df
 

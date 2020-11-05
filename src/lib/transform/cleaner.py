@@ -7,19 +7,13 @@ from prefect.engine.results import LocalResult
 from prefect.engine.result import Result
 from core import DataTask
 
-__all__ = ["_to_safe_name", "CleanDataInvesting", "CleanDataCryptowatch"]
-
-
-def _to_safe_name(symbol: str):
-    return symbol.replace("/", "")
-
 
 def unix_to_datetime(x):
     return datetime.datetime.fromtimestamp(int(x[:-3]))
 
 
 def unix_to_datetime_int(x):
-    return datetime.datetime.fromtimestamp(int(x))
+    return datetime.datetime.fromtimestamp(int(x), datetime.timezone.utc)
 
 
 class CleanDataInvesting(DataTask):
@@ -77,13 +71,69 @@ class CleanDataCryptowatch(DataTask):
 
         df.columns = ["timestamp", "open", "high", "low", "close", "volume"]
 
-        # To datetime data
-        df["timestamp"] = df["timestamp"].apply(unix_to_datetime_int)
-
-        df.index = df.timestamp
+        # Convert unix to datetime with timezone (UTC)
+        # We check this by comparing times on dataframe and my laptop time(JAPAN).
+        df.index = df["timestamp"].apply(unix_to_datetime_int)
 
         df.drop(columns="timestamp", inplace=True)
 
+        # Treatment for NaN in the middle of timestamp
         return df.reindex(
             pd.date_range(start=df.index[0], end=df.index[-1], freq="Min"), axis="index"
         )
+
+
+class CleanBybitLSRatio(DataTask):
+    """Clean raw data of long short ratio from Bybit.
+    """
+
+    def __init__(self, result: Result = LocalResult(), *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.result = result
+        self.target = "{crypto_name}_lsratio.pkl"
+
+    def run(self, path: str, crypto_name: str) -> pd.DataFrame:
+
+        crypto_name = crypto_name.upper()
+
+        with open(f"{path}/{crypto_name}_lsratio.json", "r") as f:
+            df = json.load(f)
+
+        df = pd.DataFrame(df)
+
+        # Convert unix to datetime with timezone (UTC)
+        # We check this by comparing times on dataframe and my laptop time(JAPAN).
+        df.index = df.timestamp.apply(unix_to_datetime_int)
+
+        df.drop(columns="timestamp", inplace=True)
+
+        return df
+
+
+class CleanBybitOHLC(DataTask):
+    """Clean raw ohlc data of long short ratio from Bybit.
+    """
+
+    def __init__(self, result: Result = LocalResult(), *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.result = result
+        self.target = "{crypto_name}.pkl"
+
+    def run(self, path: str, crypto_name: str) -> pd.DataFrame:
+
+        crypto_name = crypto_name.upper()
+
+        with open(f"{path}/{crypto_name}_ohlc.json", "r") as f:
+            df = json.load(f)
+
+        df = pd.DataFrame(df)[["open", "high", "low", "close", "volume", "open_time"]]
+
+        # Convert unix to datetime with timezone (UTC)
+        # We check this by comparing times on dataframe and my laptop time(JAPAN).
+        df.index = df["open_time"].apply(unix_to_datetime_int)
+
+        df.drop(columns="open_time", inplace=True)
+
+        return df

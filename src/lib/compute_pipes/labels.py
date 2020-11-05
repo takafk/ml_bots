@@ -24,7 +24,11 @@ class FwdReturn(Compute):
         ohlcdata: pd.DataFrame = inputs[0]
 
         OFF_SET = 1  # we can have position from the next day
-        fwd_return = ohlcdata['close'].pct_change(
-            self.window).shift(- self.window - OFF_SET)
+        fwd_return = (
+            ohlcdata["close"]
+            .dropna()
+            .pct_change(self.window)
+            .shift(-self.window - OFF_SET)
+        )
 
         return fwd_return.rename("fwdreturn({window})".format(window=self.window))

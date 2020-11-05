@@ -1,15 +1,18 @@
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Any
 import pandas as pd
 
 import prefect
 from prefect import task
 
-import lib.compute_pipes as cp
 from .helper import CURRENT
 
 
-@task(checkpoint=True, target="label/{dfmeta[1]}/{label_pipes}.pkl", result=CURRENT)
-def generate_label_byassets(dfmeta: Dict[pd.DataFrame, str], label_pipes: List[str]):
+@task(
+    checkpoint=True,
+    target="label/{dfmeta[1]}/{parameters[hash_value_labels]}.pkl",
+    result=CURRENT,
+)
+def generate_label_byassets(dfmeta: Dict[pd.DataFrame, str], label_pipes: List[Any]):
 
     df = dfmeta[0]
     symbol_name = dfmeta[1]
@@ -19,9 +22,7 @@ def generate_label_byassets(dfmeta: Dict[pd.DataFrame, str], label_pipes: List[s
     # Pipes should be single label and single symbol.
     assert len(label_pipes) == 2
 
-    for pipe in label_pipes:
-
-        pipe_cls = getattr(cp, pipe)()
+    for pipe_cls in label_pipes:
 
         pipe_cls.dfmeta = (df, {"symbol": symbol_name})
 
@@ -36,12 +37,10 @@ def generate_label_byassets(dfmeta: Dict[pd.DataFrame, str], label_pipes: List[s
 
 @task(
     checkpoint=True,
-    target="labels/labels_window_{window}_demean_{demean}.pkl",
+    target="labels/{parameters[symbols]}_demean_{demean}_{parameters[hash_value_labels]}.pkl",
     result=CURRENT,
 )
-def create_labels(
-    label_byassets: List[pd.DataFrame], window: int = 30, demean=True
-):
+def create_labels(label_byassets: List[pd.DataFrame], demean=True):
 
     logger = prefect.context.get("logger")
 
@@ -65,5 +64,7 @@ def create_labels(
 
     if demean:
         df = df.groupby(pd.Grouper(level=0)).apply(lambda x: x - x.mean())
+
+    logger.info("End of creating labels.")
 
     return df
