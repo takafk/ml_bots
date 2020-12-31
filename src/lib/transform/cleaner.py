@@ -108,6 +108,10 @@ class CleanBybitLSRatio(DataTask):
 
         df.drop(columns="timestamp", inplace=True)
 
+        # Reindex to have complete index.
+        # Basically we missed several datapoints in collecting data...
+        df = df.reindex(pd.date_range(df.index[0], df.index[-1], freq="5min"))
+
         return df
 
 
@@ -135,5 +139,9 @@ class CleanBybitOHLC(DataTask):
         df.index = df["open_time"].apply(unix_to_datetime_int)
 
         df.drop(columns="open_time", inplace=True)
+
+        # Reindex to have complete index.
+        # Basically we missed several datapoints in collecting data...
+        df = df.reindex(pd.date_range(df.index[0], df.index[-1], freq="1min"))
 
         return df

@@ -17,10 +17,12 @@ RUN pip install --requirement /tmp/requirements.txt \
 # Initialization of prefect. Unless chown, permission error arises in Prefecct.
 COPY --chown=$NB_USER:users config.toml $HOME/.prefect/
 
-# PREFECT__FLOWS__CHECKPOINTING="True"
 ## JupyterLab
 #RUN jupyter labextension install jupyterlab-flake8
 
-#RUN jupyter labextension install @ryantam626/jupyterlab_code_formatter@1.2.0 \
-#    && jupyter serverextension enable --py jupyterlab_code_formatter \
-#    && jupyter labextension install @jupyterlab/toc
+
+RUN jupyter labextension install @jupyterlab/toc
+
+#RUN jupyter labextension install @ryantam626/jupyterlab_code_formatter \
+#    && pip install jupyterlab_code_formatter \
+#    && jupyter serverextension enable --py jupyterlab_code_formatter

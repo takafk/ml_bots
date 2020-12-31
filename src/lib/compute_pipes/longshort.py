@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from core import Compute
 
 
-@dataclass
+@dataclass(frozen=True)
 class MeanLSDiff(Compute):
 
     window: int = field(default=180)
@@ -30,7 +30,7 @@ class MeanLSDiff(Compute):
         )
 
 
-@dataclass
+@dataclass(frozen=True)
 class MeanLSRatio(Compute):
 
     window: int = field(default=180)
@@ -56,7 +56,7 @@ class MeanLSRatio(Compute):
         )
 
 
-@dataclass
+@dataclass(frozen=True)
 class MeanHLLSDiff(Compute):
 
     window: int = field(default=180)
@@ -81,7 +81,7 @@ class MeanHLLSDiff(Compute):
         return hl_lsdiff.rolling(self.window, min_periods=1).mean().rename(self.name)
 
 
-@dataclass
+@dataclass(frozen=True)
 class MeanOCLSDiff(Compute):
 
     window: int = field(default=180)

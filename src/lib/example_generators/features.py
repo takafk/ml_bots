@@ -38,9 +38,11 @@ def generate_features_byassets(
     results = []
     for pipe_cls in feature_pipes:
 
-        pipe_cls.dfmeta = (df, {"symbol": symbol_name})
+        dfmeta = (df, {"Symbol": symbol_name})
 
-        feature: Union[pd.DataFrame, pd.Series] = pipe_cls.compute()
+        feature: Union[pd.DataFrame, pd.Series] = pipe_cls.compute(dfmeta).rename(
+            pipe_cls.name
+        )
 
         results.append(feature)
 
@@ -68,7 +70,8 @@ def create_features(feature_byassets: List[pd.DataFrame]):
 
     df = pd.concat(result, axis=0)
 
-    df.index = [df.index, df["symbol"]]
+    df.index = [df.index, df["Symbol"]]
+    df = df.rename(columns={"Symbol": "Symbol_category"})
 
     # Categorical to number
     cat_features = df.select_dtypes(include=object)

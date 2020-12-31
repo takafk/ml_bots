@@ -6,6 +6,7 @@ flake8==3.7.9
 autopep8
 black==19.10b0
 yapf
+isort
 # Pipeline
 prefect[all_extras]
 graphviz
@@ -23,5 +24,5 @@ optuna
 lightgbm
 hiplot
 # Jupyter notebook
-jupyterlab>=2.0.0
-#  jupyterlab_code_formatter
+jupyterlab==2.2.9
+nb_black

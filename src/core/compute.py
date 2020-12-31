@@ -3,21 +3,21 @@ from typing import Optional
 from dataclasses import dataclass
 
 
-@dataclass  # type: ignore
+@dataclass(frozen=True)  # type: ignore
 class Compute(metaclass=abc.ABCMeta):
 
     name: Optional[str] = None
 
     def __post_init__(self):
         if self.name is None:
-            self.name = self.__class__.__name__
+            object.__setattr__(self, "name", self.__class__.__name__)
 
     @abc.abstractmethod
-    def inputs(self):
+    def inputs(self, dfmeta):
         # Define imputs for this computation.
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def compute(self):
+    def compute(self, dfmeta: tuple):
         # Computing based on the inputs.
         raise NotImplementedError()

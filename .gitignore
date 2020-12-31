@@ -1,6 +1,8 @@
 /local_disks/
 __pycache__/
 .ipynb_checkpoints/
+.DS_Store
+.vscode/
 
 # mypy
 .mypy_cache/

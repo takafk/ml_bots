@@ -24,9 +24,11 @@ def generate_label_byassets(dfmeta: Dict[pd.DataFrame, str], label_pipes: List[A
 
     for pipe_cls in label_pipes:
 
-        pipe_cls.dfmeta = (df, {"symbol": symbol_name})
+        dfmeta = (df, {"Symbol": symbol_name})
 
-        label: Union[pd.DataFrame, pd.Series] = pipe_cls.compute()
+        label: Union[pd.DataFrame, pd.Series] = pipe_cls.compute(dfmeta).rename(
+            pipe_cls.name
+        )
 
         results.append(label)
 
@@ -55,11 +57,11 @@ def create_labels(label_byassets: List[pd.DataFrame], demean=True):
     df = pd.concat(label_list, axis=0, sort=True)
 
     # To multindex.
-    df.index = [df.index, df["symbol"]]
+    df.index = [df.index, df["Symbol"]]
     df = df.sort_index(level=0)
 
     # Rename and drop symbol in columns.
-    df = df.drop(columns="symbol")
+    df = df.drop(columns="Symbol")
     df.columns = ["label"]
 
     if demean:

@@ -4,10 +4,7 @@ from dataclasses import dataclass, field
 from core import Compute
 from ta import add_all_ta_features
 
-__all__ = [
-    "All_Technicals",
-    "AllTechnicals_WithVol",
-]
+from .base import Open, Close, High, Low, Volume
 
 
 def add_all_ta_without_leak(
@@ -56,19 +53,18 @@ def add_all_ta_without_leak(
     return features.loc[:, features.columns[features.isnull().sum() >= max_nan]]
 
 
-@dataclass
+@dataclass(frozen=True)
 class All_Technicals(Compute):
 
     window: int = field(default=63)
     quantile: float = field(default=0.01)
-    dfmeta: tuple = field(default_factory=tuple)
 
-    def inputs(self):
-        return self.dfmeta
+    def inputs(self, dfmeta):
+        return dfmeta
 
-    def compute(self) -> pd.DataFrame:
+    def compute(self, dfmeta: tuple) -> pd.DataFrame:
 
-        inputs = self.inputs()
+        inputs = self.inputs(dfmeta)
 
         data: pd.DataFrame = inputs[0]
 
@@ -91,20 +87,19 @@ class All_Technicals(Compute):
         return normed_features
 
 
-@dataclass
+@dataclass(frozen=True)
 class AllTechnicals_WithVol(Compute):
 
     window: int = field(default=63)
     quantile: float = field(default=0.01)
-    dfmeta: tuple = field(default_factory=tuple)
     normalize = True
 
-    def inputs(self):
-        return self.dfmeta
+    def inputs(self, dfmeta):
+        return dfmeta
 
-    def compute(self) -> pd.DataFrame:
+    def compute(self, dfmeta: tuple) -> pd.DataFrame:
 
-        inputs = self.inputs()
+        inputs = self.inputs(dfmeta)
 
         data: pd.DataFrame = inputs[0]
 
@@ -128,3 +123,183 @@ class AllTechnicals_WithVol(Compute):
             )
 
         return features
+
+
+@dataclass(frozen=True)
+class Return(Compute):
+    """ Return of price.
+    """
+
+    window: int = field(default=60)
+    base: Compute = field(default=Close())
+
+    def __post_init__(self):
+        object.__setattr__(
+            self, "name", f"Return({str(self.base.name)}, {self.window})"
+        )
+
+    def inputs(self, dfmeta):
+        return self.base.compute(dfmeta)
+
+    def compute(self, dfmeta: tuple) -> pd.DataFrame:
+
+        inputs = self.inputs(dfmeta)
+
+        data: pd.Series = inputs
+
+        return data.pct_change(self.window)
+
+
+@dataclass(frozen=True)
+class MADiv(Compute):
+    """ Moving Average Divergence.
+    """
+
+    window: int = field(default=60)
+    base: Compute = field(default=Close())
+
+    def __post_init__(self):
+        object.__setattr__(self, "name", f"MADiv({str(self.base.name)}, {self.window})")
+
+    def inputs(self, dfmeta):
+        return self.base.compute(dfmeta)
+
+    def compute(self, dfmeta: tuple) -> pd.DataFrame:
+
+        inputs = self.inputs(dfmeta)
+
+        data: pd.Series = inputs
+
+        mean = data.rolling(self.window, min_periods=1).mean()
+
+        return (data - mean) / mean
+
+
+@dataclass(frozen=True)
+class Support(Compute):
+    """ Supportive line.
+    """
+
+    window: int = field(default=60)
+    base: Compute = field(default=Low())
+
+    def __post_init__(self):
+        object.__setattr__(
+            self, "name", f"Support({str(self.base.name)}, {self.window})"
+        )
+
+    def inputs(self, dfmeta):
+        return self.base.compute(dfmeta)
+
+    def compute(self, dfmeta) -> pd.DataFrame:
+
+        inputs = self.inputs(dfmeta)
+
+        data: pd.Series = inputs
+
+        support = data.rolling(self.window, min_periods=1).min()
+
+        return (data - support) / support
+
+
+@dataclass(frozen=True)
+class Resistance(Compute):
+    """ Resistance line.
+    """
+
+    window: int = field(default=60)
+    base: Compute = field(default=High())
+
+    def __post_init__(self):
+        object.__setattr__(
+            self, "name", f"Resistance({str(self.base.name)}, {self.window})"
+        )
+
+    def inputs(self, dfmeta):
+        return self.base.compute(dfmeta)
+
+    def compute(self, dfmeta) -> pd.DataFrame:
+
+        inputs = self.inputs(dfmeta)
+
+        data: pd.Series = inputs
+
+        resistance = data.rolling(self.window, min_periods=1).max()
+
+        return (data - resistance) / resistance
+
+
+@dataclass(frozen=True)
+class Volatility(Compute):
+    """ Historical Volatility.
+    """
+
+    base: Compute = field(default=Return(window=1, base=Close()))
+    window: int = field(default=60)
+
+    def __post_init__(self):
+        object.__setattr__(
+            self, "name", f"Volatility({str(self.base.name)}, {self.window})"
+        )
+
+    def inputs(self, dfmeta):
+        return self.base.compute(dfmeta)
+
+    def compute(self, dfmeta) -> pd.DataFrame:
+
+        inputs = self.inputs(dfmeta)
+
+        data: pd.Series = inputs
+
+        vol = data.rolling(self.window, min_periods=1).std()
+
+        return vol
+
+
+@dataclass(frozen=True)
+class VWAP(Compute):
+    """ Volume　Weighted Average Price.
+    """
+
+    window: int = field(default=60)
+    base: Compute = field(default=Close())
+
+    def __post_init__(self):
+        object.__setattr__(self, "name", f"VWAP({str(self.base.name)}, {self.window})")
+
+    def inputs(self, dfmeta):
+        return self.base.compute(dfmeta), Volume().compute(dfmeta)
+
+    def compute(self, dfmeta) -> pd.DataFrame:
+
+        inputs = self.inputs(dfmeta)
+
+        price: pd.Series = inputs[0]
+        volume: pd.Series = inputs[1]
+
+        trading_price = (price * volume).rolling(self.window, min_periods=1).sum()
+
+        vwap = trading_price / volume.rolling(self.window, min_periods=1).sum()
+
+        return (price - vwap) / vwap
+
+
+@dataclass(frozen=True)
+class Liquidity(Compute):
+    """ Liquidity estimated by Open and Close.
+    """
+
+    def inputs(self, dfmeta):
+        return Open().compute(dfmeta), Close().compute(dfmeta), Volume().compute(dfmeta)
+
+    def compute(self, dfmeta) -> pd.DataFrame:
+
+        inputs = self.inputs(dfmeta)
+
+        open: pd.Series = inputs[0]
+        close: pd.Series = inputs[1]
+        volume: pd.Series = inputs[2]
+
+        mid_price = (open + close) / 2
+
+        return (open - close).abs() / (mid_price * volume)

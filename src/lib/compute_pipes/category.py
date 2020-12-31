@@ -1,85 +1,46 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 import pandas as pd
 
 from core import Compute
 
-__all__ = [
-    "Symbol",
-    "Country",
-    "Asset",
-]
 
-
-@dataclass
+@dataclass(frozen=True)
 class Symbol(Compute):
+    def inputs(self, dfmeta):
+        return dfmeta
 
-    dfmeta: tuple = field(default_factory=tuple)
-    name: str = "symbol"
+    def compute(self, dfmeta) -> pd.Series:
 
-    def inputs(self) -> tuple:
-        return self.dfmeta
+        inputs = self.inputs(dfmeta)
 
-    def compute(self) -> pd.Series:
+        data: pd.Series = inputs[0]
+        metadata: dict = inputs[1]
 
-        dfmeta = self.inputs()
-
-        data: pd.DataFrame = dfmeta[0]
-        metadata: dict = dfmeta[1]
-
-        if "symbol" not in metadata.keys():
+        if "Symbol" not in metadata.keys():
             raise ValueError("Symbol should be given in metadata.")
 
-        result = pd.Series([metadata["symbol"] for i in range(len(data))])
+        result = pd.Series([metadata["Symbol"] for i in range(len(data))])
         result.index = data.index
 
-        return result.rename(self.name)
+        return result
 
 
-@dataclass
+@dataclass(frozen=True)
 class Country(Compute):
+    def inputs(self, dfmeta):
+        return dfmeta
 
-    dfmeta: tuple = field(default_factory=tuple)
-    name: str = "country"
+    def compute(self, dfmeta) -> pd.Series:
 
-    def inputs(self) -> tuple:
-        return self.dfmeta
+        inputs = self.inputs(dfmeta)
 
-    def compute(self) -> pd.Series:
+        data: pd.Series = inputs[0]
+        metadata: dict = inputs[1]
 
-        dfmeta = self.inputs()
-
-        data: pd.DataFrame = dfmeta[0]
-        metadata: dict = dfmeta[1]
-
-        if "country" not in metadata.keys():
+        if "Country" not in metadata.keys():
             raise ValueError("Country should be given in metadata.")
 
-        result = pd.Series([metadata["country"] for i in range(len(data))])
+        result = pd.Series([metadata["Country"] for i in range(len(data))])
         result.index = data.index
 
-        return result.rename(self.name)
-
-
-@dataclass
-class Asset(Compute):
-
-    dfmeta: tuple = field(default_factory=tuple)
-    name: str = "asset"
-
-    def inputs(self) -> tuple:
-        return self.dfmeta
-
-    def compute(self) -> pd.Series:
-
-        dfmeta = self.inputs()
-
-        data: pd.DataFrame = dfmeta[0]
-        metadata: dict = dfmeta[1]
-
-        if "asset" not in metadata.keys():
-            raise ValueError("Country should be given in metadata.")
-
-        result = pd.Series([metadata["asset"] for i in range(len(data))])
-        result.index = data.index
-
-        return result.rename(self.name)
+        return result
