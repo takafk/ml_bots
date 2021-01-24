@@ -2,7 +2,6 @@ import pandas as pd
 from dataclasses import dataclass, field
 
 from core import ComputePipe
-from ta import add_all_ta_features
 
 from .rawdata import RawData
 

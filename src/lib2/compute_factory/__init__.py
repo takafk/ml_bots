@@ -14,3 +14,4 @@ from .category import Symbol
 from .longshort import LSRatio
 from .rawdata import RawData
 from .labels import FwdReturn
+from .benchmark import MarketReturn
