@@ -10,14 +10,16 @@ __all__ = ["fetch_global_data", "clean_global_data"]
 
 
 def fetch_global_data(symbols: List[dict], result: Result = LocalResult()) -> Flow:
-    """ Fetch all data for global assets from investing.com in data lake.
+    """Fetch all data for global assets from investing.com in data lake.
 
     Args:
         symbols (List[dict]): List of dictionary. each dictionary have 'symbol', 'asset', 'country' key.
         result (Result): Result instance to write data.
     """
 
-    with Flow("Fetch data for GlobalAssets from investing.com.",) as flow_fetch_rawdata:
+    with Flow(
+        "Fetch data for GlobalAssets from investing.com.",
+    ) as flow_fetch_rawdata:
 
         symbol_list = Parameter("symbols", default=symbols)
 
@@ -29,9 +31,11 @@ def fetch_global_data(symbols: List[dict], result: Result = LocalResult()) -> Fl
 
 
 def clean_global_data(
-    symbols: List[dict], input: Result = LocalResult(), output: Result = LocalResult(),
+    symbols: List[dict],
+    input: Result = LocalResult(),
+    output: Result = LocalResult(),
 ) -> Flow:
-    """ Clean all raw data for global assets and store in data warehouse.
+    """Clean all raw data for global assets and store in data warehouse.
 
     Args:
         symbols (List[dict]): List of dictionary. each dictionary have 'symbol', 'asset', 'country' key.
@@ -39,7 +43,9 @@ def clean_global_data(
         output_result (Result): Result instance to write data.
     """
 
-    with Flow("Clean data for GlobalAssets.",) as flow_fetch_rawdata:
+    with Flow(
+        "Clean data for GlobalAssets.",
+    ) as flow_fetch_rawdata:
 
         symbol_list = Parameter("symbols", default=symbols)
 

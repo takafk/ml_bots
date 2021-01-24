@@ -1,15 +1,16 @@
+awscli
 urllib3
 # Coding
 pytest
-pycodestyle>=2.6.0
-flake8==3.7.9
+flake8
 autopep8
-black==19.10b0
+black
 yapf
 isort
 # Pipeline
-prefect[all_extras]
+prefect
 graphviz
+dask[complete]
 # Quantitative Investment
 ccxt
 investpy>=0.9.14
@@ -19,10 +20,13 @@ ta
 scikit-learn>=0.23.2
 torch>=1.6.0
 torchvision
-imbalanced-learn
 optuna
 lightgbm
-hiplot
 # Jupyter notebook
 jupyterlab==2.2.9
 nb_black
+# Display
+# streamlit (to use this, we need to use python 3.7.
+hiplot
+fastapi
+uvicorn

@@ -9,6 +9,7 @@ RUN sudo apt-get update && sudo apt-get install graphviz -y wget \
 
 # Install additional packages (to store cache, we do it on $NB_USER.)
 USER $NB_USER
+RUN pip install --upgrade pip setuptools wheel
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --requirement /tmp/requirements.txt \
     && fix-permissions $CONDA_DIR \

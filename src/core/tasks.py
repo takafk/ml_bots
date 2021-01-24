@@ -2,7 +2,7 @@ from prefect import Task
 
 
 class DataTask(Task):
-    """ Wrapper of Task to write data by default.
+    """Wrapper of Task to write data by default.
 
     In Task on Perfect, we always need to set checkpoint= True
     to persist output.

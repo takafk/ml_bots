@@ -5,7 +5,7 @@ from numpy.random import normal
 
 @pytest.fixture
 def test_ohlcdata():
-    """ Test data for simple leak checking.
+    """Test data for simple leak checking.
 
     Returns:
         pd.DataFrame: OHLC dataframe.
