@@ -1,4 +1,3 @@
-from typing import Any, List, Optional
 from dataclasses import dataclass, field
 import pandas as pd
 import h5py
@@ -15,13 +14,13 @@ class RawData(ComputePipe):
     def __post_init__(self):
         object.__setattr__(self, "name", f"RawData({str(self.key)})")
 
-    def inputs(self, dsmap: tuple):
+    def inputs(self, dsmeta: tuple):
         return None
 
-    def compute(self, dsmap: tuple) -> pd.DataFrame:
+    def compute(self, dsmeta: tuple) -> pd.DataFrame:
 
-        datastore = dsmap[0]
-        symbols = dsmap[1]
+        datastore = dsmeta[0]
+        symbols = dsmeta[1]
 
         with h5py.File(datastore, "r") as f:
             assert self.key in list(

@@ -27,7 +27,7 @@ class Return(ComputePipe):
 
         data: pd.DataFrame = inputs
 
-        return data.pct_change(self.window)
+        return data.pct_change(self.window, fill_method=None)
 
 
 @dataclass(frozen=True)
@@ -161,16 +161,28 @@ class VWAP(ComputePipe):
 
 @dataclass(frozen=True)
 class Liquidity(ComputePipe):
-    """Liquidity estimated by Open and Close."""
+    """Amihud like Liquidity estimated by Open and Close.
 
-    open: ComputePipe = field(default=RawData(key="open"))
-    close: ComputePipe = field(default=RawData(key="close"))
+    Args:
+        open_price (ComputePipe): [description]
+        close_price (ComputePipe): [description]
+        volume (ComputePipe): [description]
+
+    Returns:
+        [type]: [description]
+
+    Notes:
+        - We change denominator not to have 0 while keeping the meaning of liquidity.
+    """
+
+    open_price: ComputePipe = field(default=RawData(key="open"))
+    close_price: ComputePipe = field(default=RawData(key="close"))
     volume: ComputePipe = field(default=RawData(key="volume"))
 
     def inputs(self, dsmeta):
         return (
-            self.open.compute(dsmeta),
-            self.close.compute(dsmeta),
+            self.open_price.compute(dsmeta),
+            self.close_price.compute(dsmeta),
             self.volume.compute(dsmeta),
         )
 
@@ -178,10 +190,12 @@ class Liquidity(ComputePipe):
 
         inputs = self.inputs(dsmeta)
 
-        open: pd.Series = inputs[0]
-        close: pd.Series = inputs[1]
+        open_price: pd.Series = inputs[0]
+        close_price: pd.Series = inputs[1]
         volume: pd.Series = inputs[2]
 
-        mid_price = (open + close) * 0.5
+        returns = (open_price - close_price) / open_price
+        mid_price = (open_price + close_price) * 0.5
+        trading_value = mid_price * volume
 
-        return (open - close).abs() / (mid_price * volume)
+        return trading_value / (1 + returns.abs())

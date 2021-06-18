@@ -13,6 +13,8 @@ services:
       CHOWN_EXTRA_OPTS: -R
     ports:
       - "8888:8888"
+      - "8501:8501" # Port for streamlit
+      - "5000:5000" # Port for mlflow
     volumes:
       - ~/ml_bots:/home/$NB_USER/work
     working_dir: /home/$NB_USER

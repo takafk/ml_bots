@@ -14,11 +14,21 @@ class DatastoreComposer:
         To create the kind of features, we decied to save the data by field name such as open.
         For this purpose, it would be better to use HDF5 store than json or pkl
         and this class is created on this purpose.
+
+    Args:
+        path(str): path to read pickle data.
+        symbols(List[str]): list of symbols used for composing this datastore.
+        data_names(List[str]): list of data names such as ohlc and lsratio.
+        start_dt(str): start date/
+        end_dt(str): end date.
+    Returns:
     """
 
     path: str
     symbols: list = field(default_factory=List[str])
     data_names: list = field(default_factory=List[str])
+    start_dt: str = field(default_factory=str)
+    end_dt: str = field(default_factory=str)
 
     def compose_data(self, path: str, symbols: List[str], data_name: str):
 
@@ -32,6 +42,7 @@ class DatastoreComposer:
                 df = pickle.load(f)
 
             df.index.name = "timestamp"
+            df = df[(df.index >= self.start_dt) & (df.index <= self.end_dt)]
 
             df["symbol"] = symbol
             result.append(df)

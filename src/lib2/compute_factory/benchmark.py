@@ -1,8 +1,7 @@
 import pandas as pd
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from core import ComputePipe
-from ta import add_all_ta_features
 
 from .rawdata import RawData
 from .technicals import Return
@@ -30,4 +29,4 @@ class MarketReturn(ComputePipe):
         trading_value = volume.mul(close)
         weights = trading_value.div(trading_value.sum(axis=1), axis="index")
 
-        return returns.mul(weights).sum(axis=1)
+        return returns.mul(weights, fill_value=None).sum(axis=1)

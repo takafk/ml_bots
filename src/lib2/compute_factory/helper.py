@@ -1,26 +1,40 @@
-from typing import Tuple, Union, List
 import pandas as pd
+from dataclasses import dataclass
 
-from core import Compute
-from prefect import task
+from core import ComputePipe
 
-__all__ = ["generate_features"]
+from .rawdata import RawData
+from .benchmark import MarketReturn
 
 
-@task(checkpoint=False)
-def generate_features(dfmeta: Tuple[pd.DataFrame, dict], pipes: List[Compute]):
+@dataclass(frozen=True)
+class Extend(ComputePipe):
+    """Extend pd.Series to pd.DataFrame."""
 
-    meta = dfmeta[1]
+    series: ComputePipe = MarketReturn()
+    base: ComputePipe = RawData(key="close")
 
-    results = []
-    for pipe in pipes:
+    def __post_init__(self):
+        object.__setattr__(
+            self,
+            "name",
+            f"Extend(series={str(self.series.name)}, base={self.base.name})",
+        )
 
-        pipe.dfmeta = dfmeta
+    def inputs(self, dsmeta):
+        return (
+            self.series.compute(dsmeta),
+            self.base.compute(dsmeta),
+        )
 
-        feature: Union[pd.DataFrame, pd.Series] = pipe.compute()
+    def compute(self, dsmeta: tuple) -> pd.DataFrame:
 
-        results.append(feature)
+        inputs = self.inputs(dsmeta)
 
-    features = pd.concat(results, axis=1)
+        series: pd.Series = inputs[0]
+        base: pd.DataFrame = inputs[1]
 
-    return (features.dropna(), meta)
+        for col in base.columns:
+            base.loc[:, col] = series.reindex(base.index)
+
+        return base

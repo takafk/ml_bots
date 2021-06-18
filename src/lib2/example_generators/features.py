@@ -1,4 +1,4 @@
-from typing import Tuple, List, Union, Any
+from typing import Tuple, List, Any
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
@@ -13,15 +13,19 @@ CURRENT = LocalResult(dir="./datastore/")
 
 @task(
     checkpoint=True,
-    target="feature/{feature_pipe.name}/{dsmeta[1]}.pkl",
+    target="feature/{feature_pipe.name}/{parameters[hash_value_universe]}_{start_dt}_{end_dt}.pkl",
     result=CURRENT,
 )
-def generate_feature(dsmeta: Tuple[str, List[str]], feature_pipe: Any):
+def generate_feature(
+    dsmeta: Tuple[str, List[str]], feature_pipe: Any, start_dt: str, end_dt: str
+):
     """Generate features for each symbols.
 
     Args:
         dfmeta (Tuple[str, List[str]]): Tuple of datastore and symbols.
         feature_pipe (Any): Feature pipeline defined in lib2.compute_factory
+        start_dt: start day of feature.
+        end_dt: end day of feature.
 
     Returns:
         pd.DataFrame: Dataframe of feature.
@@ -35,6 +39,14 @@ def generate_feature(dsmeta: Tuple[str, List[str]], feature_pipe: Any):
 
     feature_multi = feature.stack().sort_index().rename(feature_pipe.name)
 
+    # Limit the lenghth of the data.
+    # Without this limitation, we cannot create dataframe of features in generate_features
+    # due to the error, "_pickle.UnpicklingError: pickle data was truncated".
+    feature_multi = feature_multi[
+        (feature_multi.index.get_level_values(0) >= start_dt)
+        & (feature_multi.index.get_level_values(0) <= end_dt)
+    ]
+
     return feature_multi
 
 
@@ -43,12 +55,10 @@ def generate_feature(dsmeta: Tuple[str, List[str]], feature_pipe: Any):
     target="features/{parameters[hash_value_features]}.pkl",
     result=CURRENT,
 )
-def generate_features(start_dt: str, end_dt: str, features: List[pd.DataFrame]):
+def generate_features(features: List[pd.DataFrame]):
     """Generate features for each symbols.
 
     Args:
-        start_dt: start day of feature.
-        end_dt: end day of feature.
         features: List of features.
 
     Returns:
@@ -66,12 +76,9 @@ def generate_features(start_dt: str, end_dt: str, features: List[pd.DataFrame]):
 
     for feature_multi in features:
 
-        feature_multi = feature_multi[
-            (feature_multi.index.get_level_values(0) > start_dt)
-            & (feature_multi.index.get_level_values(0) < end_dt)
-        ]
-
-        assert len(feature_multi) != 0, f"{feature_multi.name} of values are all None."
+        assert (
+            len(feature_multi.dropna()) != 0
+        ), f"{feature_multi.name} of values are all None."
 
         results.append(feature_multi)
 

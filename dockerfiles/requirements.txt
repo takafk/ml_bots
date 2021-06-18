@@ -7,7 +7,10 @@ autopep8
 black
 yapf
 isort
-# Pipeline
+# MLops
+# Experiment management
+mlflow
+# PIPELINE
 prefect
 graphviz
 dask[complete]
@@ -26,7 +29,8 @@ lightgbm
 jupyterlab==2.2.9
 nb_black
 # Display
-# streamlit (to use this, we need to use python 3.7.
+streamlit #(to use this, we need to use python 3.7.
 hiplot
+# For Deployment
 fastapi
 uvicorn

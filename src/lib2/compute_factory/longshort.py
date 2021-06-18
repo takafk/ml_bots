@@ -1,5 +1,5 @@
 import pandas as pd
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from core import ComputePipe
 from .last_observed import LSRatioLO

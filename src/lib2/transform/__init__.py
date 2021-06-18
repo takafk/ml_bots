@@ -4,6 +4,7 @@ from .cleaner import (
     CleanDataCryptowatch,
     CleanBybitLSRatio,
     CleanBybitOHLC,
+    CleanBinanceOHLC,
 )
 from .reduce import *
 from .dataset_composer import DatastoreComposer

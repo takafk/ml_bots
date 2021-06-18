@@ -142,3 +142,70 @@ class CleanBybitOHLC(DataTask):
         df = df.reindex(pd.date_range(df.index[0], df.index[-1], freq="1min"))
 
         return df
+
+
+class CleanBinanceOHLC(DataTask):
+    """Clean raw ohlc data of long short ratio from Binance."""
+
+    def __init__(self, result: Result = LocalResult(), *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.result = result
+        self.target = "{crypto_name}_ohlc.pkl"
+
+    def run(self, path: str, crypto_name: str) -> pd.DataFrame:
+
+        crypto_name = crypto_name.upper()
+
+        with open(f"{path}/{crypto_name}_ohlc.json", "r") as f:
+            df = json.load(f)
+
+        cols = [
+            "open time",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            "close time",
+            "quote asset volume",
+            "number of trades",
+            "taker buy base asset volume",
+            "taker buy quote asset volume",
+            "ignore.",
+        ]
+
+        df = pd.DataFrame(df)
+        df.columns = cols
+
+        # Convert unix to datetime with timezone (UTC)
+        # We check this by comparing times on dataframe and my laptop time(JAPAN).
+        df.index = df["close time"].apply(
+            lambda x: datetime.datetime.fromtimestamp(int(str(x)[:-3]))
+        )
+        df.index.name = "timestamp"
+
+        # Remove unnecessary columns
+        df = df.loc[
+            :,
+            ~df.columns.isin(
+                [
+                    "open time",
+                    "close time",
+                    "quote asset volume",
+                    "taker buy quote asset volume",
+                    "ignore.",
+                ]
+            ),
+        ]
+
+        # Change data type from str to float.
+        df[df.columns[df.dtypes == "object"]] = df[
+            df.columns[df.dtypes == "object"]
+        ].apply(lambda x: x.astype(float))
+
+        # Reindex to have complete index.
+        # Basically we missed several datapoints in collecting data...
+        df = df.reindex(pd.date_range(df.index[0], df.index[-1], freq="1min"))
+
+        return df

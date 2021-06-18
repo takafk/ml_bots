@@ -9,7 +9,7 @@ from .helper import CURRENT
 
 @task(
     checkpoint=True,
-    target="labels/{label_pipe.name}/{dsmeta[1]}.pkl",
+    target="labels/{label_pipe.name}/{parameters[hash_value_universe]}_{start_dt}_{end_dt}.pkl",
     result=CURRENT,
 )
 def generate_label(
@@ -34,9 +34,15 @@ def generate_label(
     # index = timestamp, columns = symbols
     label: pd.DataFrame = label_pipe.compute(dsmeta)
 
-    label = label[(label.index > start_dt) & (label.index < end_dt)]
+    label = label[(label.index >= start_dt) & (label.index <= end_dt)]
 
     label = label.stack().sort_index().rename("label")
+
+    symbols = dsmeta[1]
+
+    assert all(
+        label.groupby(pd.Grouper(level=0)).count() == len(symbols)
+    ), "Several samples do not have enough symbols in day. Change interval to have continuous data."
 
     logger.info("End of creating labels.")
 

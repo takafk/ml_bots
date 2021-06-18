@@ -110,9 +110,6 @@ class AllTechnicals_WithVol(Compute):
 
         if self.normalize:
 
-            # Normalization and Treatment for extreme value
-            # zscored_features = features.apply(lambda x: (x.rolling(self.window).mean() - x) / x.rolling(self.window).apply(lambda x: x.quantile(0.75) - x.quantile(0.25)))
-
             zscored_features = features.apply(
                 lambda x: (x.mean() - x) / (x.quantile(0.75) - x.quantile(0.25))
             )

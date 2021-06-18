@@ -10,6 +10,7 @@ RUN sudo apt-get update && sudo apt-get install graphviz -y wget \
 # Install additional packages (to store cache, we do it on $NB_USER.)
 USER $NB_USER
 RUN pip install --upgrade pip setuptools wheel
+COPY flake8 /home/$NB_USER/work/.config/flake8
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --requirement /tmp/requirements.txt \
     && fix-permissions $CONDA_DIR \
@@ -20,10 +21,4 @@ COPY --chown=$NB_USER:users config.toml $HOME/.prefect/
 
 ## JupyterLab
 #RUN jupyter labextension install jupyterlab-flake8
-
-
 RUN jupyter labextension install @jupyterlab/toc
-
-#RUN jupyter labextension install @ryantam626/jupyterlab_code_formatter \
-#    && pip install jupyterlab_code_formatter \
-#    && jupyter serverextension enable --py jupyterlab_code_formatter
