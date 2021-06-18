@@ -22,13 +22,10 @@ class RawData(ComputePipe):
         datastore = dsmeta[0]
         symbols = dsmeta[1]
 
-        with h5py.File(datastore, "r") as f:
-            assert self.key in list(
-                f.keys()
-            ), "Given key does not exist in the datastore."
+        result: dict = datastore.query_datas(keys=[self.key])
 
         # index = timestamp, columns = symbols
-        df: pd.DataFrame = pd.read_hdf(datastore, key=self.key)
+        df: pd.DataFrame = result[self.key]
 
         assert set(symbols) <= set(
             df.columns.tolist()
