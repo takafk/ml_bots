@@ -55,7 +55,9 @@ class DatastoreComposer:
 
     def write_hdf5_bycolumn(self, path: str, df: pd.DataFrame):
         for col in df.columns:
-            df.loc[:, col].unstack().to_hdf(f"{path}/datastore.h5", key=col, mode="a")
+            df.loc[:, col].unstack().to_hdf(
+                f"{path}/datastore.h5", key=col, mode="a"
+            )
 
     def compose_datastore(self):
 

@@ -37,10 +37,13 @@ class AlphaReport:
     def compute_daily_metrics(self, returns: pd.DataFrame):
 
         metrics = pd.DataFrame(
-            returns.groupby(returns.index.day).count().rename("Number of Trade")
+            returns.groupby(returns.index.day)
+            .count()
+            .rename("Number of Trade")
         )
         metrics["Return(%)"] = (
-            returns.groupby(returns.index.day).sum().rename("Daily Return(%)") * 100
+            returns.groupby(returns.index.day).sum().rename("Daily Return(%)")
+            * 100
         ).round(3)
         metrics["Max DrawDown(%)"] = (
             returns.groupby(returns.index.day).apply(
@@ -62,9 +65,15 @@ class AlphaReport:
 
         quantile_return = self.compute_quantile_return()
 
-        long = quantile_return[quantile_return.columns.max()].rename("long") - cost
+        long = (
+            quantile_return[quantile_return.columns.max()].rename("long")
+            - cost
+        )
 
-        short = -quantile_return[quantile_return.columns.min()].rename("short") - cost
+        short = (
+            -quantile_return[quantile_return.columns.min()].rename("short")
+            - cost
+        )
 
         spread = (long + short).rename("spread") / 2
         drawdown = self.compute_drawdown(spread.cumsum())

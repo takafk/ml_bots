@@ -38,7 +38,9 @@ class MADiv(ComputePipe):
     base: ComputePipe = field(default=Return())
 
     def __post_init__(self):
-        object.__setattr__(self, "name", f"MADiv({str(self.base.name)}, {self.window})")
+        object.__setattr__(
+            self, "name", f"MADiv({str(self.base.name)}, {self.window})"
+        )
 
     def inputs(self, dsmeta):
         return self.base.compute(dsmeta)
@@ -140,7 +142,9 @@ class VWAP(ComputePipe):
     base: ComputePipe = field(default=RawData(key="close"))
 
     def __post_init__(self):
-        object.__setattr__(self, "name", f"VWAP({str(self.base.name)}, {self.window})")
+        object.__setattr__(
+            self, "name", f"VWAP({str(self.base.name)}, {self.window})"
+        )
 
     def inputs(self, dsmeta):
         return self.base.compute(dsmeta), RawData("volume").compute(dsmeta)
@@ -152,7 +156,9 @@ class VWAP(ComputePipe):
         price: pd.Series = inputs[0]
         volume: pd.Series = inputs[1]
 
-        trading_price = (price * volume).rolling(self.window, min_periods=1).sum()
+        trading_price = (
+            (price * volume).rolling(self.window, min_periods=1).sum()
+        )
 
         vwap = trading_price / volume.rolling(self.window, min_periods=1).sum()
 

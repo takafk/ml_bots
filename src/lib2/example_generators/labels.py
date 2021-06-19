@@ -9,7 +9,7 @@ from .helper import CURRENT
 
 @task(
     checkpoint=True,
-    target="labels/{label_pipe.name}/{parameters[hash_value_universe]}_{start_dt}_{end_dt}.pkl",
+    target="labels/{label_pipe.name}/{parameters[universe]}_{start_dt}_{end_dt}.pkl",
     result=CURRENT,
 )
 def generate_label(

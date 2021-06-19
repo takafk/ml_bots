@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 import pandas as pd
-import h5py
 
 from core import ComputePipe
 
@@ -22,6 +21,7 @@ class RawData(ComputePipe):
         datastore = dsmeta[0]
         symbols = dsmeta[1]
 
+        # Query raw data from the datastore.
         result: dict = datastore.query_datas(keys=[self.key])
 
         # index = timestamp, columns = symbols

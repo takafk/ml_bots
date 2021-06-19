@@ -4,7 +4,9 @@ from prefect import task
 
 
 @task(checkpoint=False)
-def ic_selection(raw_examples: pd.DataFrame, num_of_features: int = 6) -> pd.DataFrame:
+def ic_selection(
+    raw_examples: pd.DataFrame, num_of_features: int = 6
+) -> pd.DataFrame:
     """Feature selection by historical cross-sectional IC.
 
     Args:
@@ -21,7 +23,9 @@ def ic_selection(raw_examples: pd.DataFrame, num_of_features: int = 6) -> pd.Dat
     num_examples = raw_examples.select_dtypes(include=float)
 
     # Compute cross-sectional correlations.
-    cross_sectional_corr = num_examples.groupby(pd.Grouper(level=0)).corr()["label"]
+    cross_sectional_corr = num_examples.groupby(pd.Grouper(level=0)).corr()[
+        "label"
+    ]
 
     cross_sectional_corr = cross_sectional_corr.unstack()
 
@@ -34,8 +38,8 @@ def ic_selection(raw_examples: pd.DataFrame, num_of_features: int = 6) -> pd.Dat
     )
 
     # Select features in the top and bottom groups.
-    selected_features = list(cumulative_corr[: num_of_features // 2].index) + list(
-        cumulative_corr[-num_of_features // 2 :].index
-    )
+    selected_features = list(
+        cumulative_corr[: num_of_features // 2].index
+    ) + list(cumulative_corr[-num_of_features // 2:].index)
 
     return raw_examples[["label"] + selected_features]

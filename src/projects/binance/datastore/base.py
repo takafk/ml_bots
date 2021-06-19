@@ -21,4 +21,6 @@ class BinanceLocalDataStore(_LocalDataStore):
             set(total_symbols) - set(futures) - set(not_proper_symbols)
         )
 
-        return total_symbols.sort()
+        total_symbols.sort()
+
+        return total_symbols

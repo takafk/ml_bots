@@ -22,5 +22,6 @@ def test_ohlcdata():
     }
 
     return pd.DataFrame(
-        test_ohlcdata, index=pd.date_range(start="19/09/2012", periods=Length, freq="D")
+        test_ohlcdata,
+        index=pd.date_range(start="19/09/2012", periods=Length, freq="D"),
     )

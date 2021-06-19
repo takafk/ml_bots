@@ -34,15 +34,17 @@ class Beta(ComputePipe):
 
         jobs = []
 
-        for i, day in enumerate(returns[self.window - 1 :].index):
+        for i, day in enumerate(returns[self.window - 1:].index):
 
-            df = returns.iloc[i : i + self.window]
+            df = returns.iloc[i: i + self.window]
 
             jobs.append(delayed(self._compute_beta_bysymbol)(df.dropna()))
 
             output = Parallel(n_jobs=4, verbose=1)(jobs)
 
-        betas = pd.DataFrame([o[1] for o in output], index=[o[0] for o in output])
+        betas = pd.DataFrame(
+            [o[1] for o in output], index=[o[0] for o in output]
+        )
         betas.colums = returns.columns
 
         return betas

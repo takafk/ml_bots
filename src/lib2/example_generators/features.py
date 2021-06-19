@@ -13,11 +13,14 @@ CURRENT = LocalResult(dir="./datastore/")
 
 @task(
     checkpoint=True,
-    target="feature/{feature_pipe.name}/{parameters[hash_value_universe]}_{start_dt}_{end_dt}.pkl",
+    target="feature/{feature_pipe.name}/{parameters[universe]}_{start_dt}_{end_dt}.pkl",
     result=CURRENT,
 )
 def generate_feature(
-    dsmeta: Tuple[str, List[str]], feature_pipe: Any, start_dt: str, end_dt: str
+    dsmeta: Tuple[str, List[str]],
+    feature_pipe: Any,
+    start_dt: str,
+    end_dt: str,
 ):
     """Generate features for each symbols.
 
@@ -52,7 +55,7 @@ def generate_feature(
 
 @task(
     checkpoint=True,
-    target="features/{parameters[hash_value_features]}.pkl",
+    target="features/{parameters[feature]}.pkl",
     result=CURRENT,
 )
 def generate_features(features: List[pd.DataFrame]):
@@ -109,6 +112,8 @@ def _cat_to_num(x: pd.Series) -> pd.Series:
     le = LabelEncoder()
     le = le.fit(x_notnull.values)
 
-    cat_series_transformed = pd.Series(data=le.transform(x_notnull), index=index)
+    cat_series_transformed = pd.Series(
+        data=le.transform(x_notnull), index=index
+    )
 
     return cat_series_transformed.reindex(index_org)

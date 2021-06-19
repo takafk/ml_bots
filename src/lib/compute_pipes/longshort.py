@@ -78,7 +78,11 @@ class MeanHLLSDiff(Compute):
             data["high"] - data["low"]
         )
 
-        return hl_lsdiff.rolling(self.window, min_periods=1).mean().rename(self.name)
+        return (
+            hl_lsdiff.rolling(self.window, min_periods=1)
+            .mean()
+            .rename(self.name)
+        )
 
 
 @dataclass(frozen=True)
@@ -103,4 +107,8 @@ class MeanOCLSDiff(Compute):
             data["open"] - data["close"]
         )
 
-        return oc_lsdiff.rolling(self.window, min_periods=1).mean().rename(self.name)
+        return (
+            oc_lsdiff.rolling(self.window, min_periods=1)
+            .mean()
+            .rename(self.name)
+        )

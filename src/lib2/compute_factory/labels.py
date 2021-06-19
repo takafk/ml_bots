@@ -102,6 +102,8 @@ class DeMarket(ComputePipe):
         )
 
         # One day de market return.
-        de_market = fwd_return.sub(mreturn.reindex(fwd_return.index), axis="index")
+        de_market = fwd_return.sub(
+            mreturn.reindex(fwd_return.index), axis="index"
+        )
 
         return de_market

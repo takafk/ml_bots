@@ -40,9 +40,9 @@ def generate_features_byassets(
 
         dfmeta = (df, {"Symbol": symbol_name})
 
-        feature: Union[pd.DataFrame, pd.Series] = pipe_cls.compute(dfmeta).rename(
-            pipe_cls.name
-        )
+        feature: Union[pd.DataFrame, pd.Series] = pipe_cls.compute(
+            dfmeta
+        ).rename(pipe_cls.name)
 
         results.append(feature)
 

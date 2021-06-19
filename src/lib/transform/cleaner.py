@@ -77,7 +77,8 @@ class CleanDataCryptowatch(DataTask):
 
         # Treatment for NaN in the middle of timestamp
         return df.reindex(
-            pd.date_range(start=df.index[0], end=df.index[-1], freq="Min"), axis="index"
+            pd.date_range(start=df.index[0], end=df.index[-1], freq="Min"),
+            axis="index",
         )
 
 
@@ -128,7 +129,9 @@ class CleanBybitOHLC(DataTask):
         with open(f"{path}/{crypto_name}_ohlc.json", "r") as f:
             df = json.load(f)
 
-        df = pd.DataFrame(df)[["open", "high", "low", "close", "volume", "open_time"]]
+        df = pd.DataFrame(df)[
+            ["open", "high", "low", "close", "volume", "open_time"]
+        ]
 
         # Convert unix to datetime with timezone (UTC)
         # We check this by comparing times on dataframe and my laptop time(JAPAN).

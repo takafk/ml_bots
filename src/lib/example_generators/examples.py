@@ -6,7 +6,11 @@ from prefect import task
 from .helper import CURRENT
 
 
-@task(checkpoint=True, target="examples/raw_examples_{hash_value}.pkl", result=CURRENT)
+@task(
+    checkpoint=True,
+    target="examples/raw_examples_{hash_value}.pkl",
+    result=CURRENT,
+)
 def generate_raw_examples(
     features: pd.DataFrame,
     labels: pd.DataFrame,
@@ -24,7 +28,11 @@ def generate_raw_examples(
 
     # Generate examples from the features and the labels.
     examples = pd.merge(
-        left=labels, right=features, left_index=True, right_index=True, how="left"
+        left=labels,
+        right=features,
+        left_index=True,
+        right_index=True,
+        how="left",
     )
 
     # Restrict the examples from start_dt to end_dt

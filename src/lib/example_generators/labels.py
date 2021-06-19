@@ -12,7 +12,9 @@ from .helper import CURRENT
     target="label/{dfmeta[1]}/{parameters[hash_value_labels]}.pkl",
     result=CURRENT,
 )
-def generate_label_byassets(dfmeta: Dict[pd.DataFrame, str], label_pipes: List[Any]):
+def generate_label_byassets(
+    dfmeta: Dict[pd.DataFrame, str], label_pipes: List[Any]
+):
 
     df = dfmeta[0]
     symbol_name = dfmeta[1]
@@ -26,9 +28,9 @@ def generate_label_byassets(dfmeta: Dict[pd.DataFrame, str], label_pipes: List[A
 
         dfmeta = (df, {"Symbol": symbol_name})
 
-        label: Union[pd.DataFrame, pd.Series] = pipe_cls.compute(dfmeta).rename(
-            pipe_cls.name
-        )
+        label: Union[pd.DataFrame, pd.Series] = pipe_cls.compute(
+            dfmeta
+        ).rename(pipe_cls.name)
 
         results.append(label)
 

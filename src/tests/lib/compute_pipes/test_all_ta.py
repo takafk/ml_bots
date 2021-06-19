@@ -45,6 +45,8 @@ class TestSimpleLeak:
         part_features, all_features = compute_ta_features
 
         assert (
-            assert_frame_equal(all_features.loc[part_features.index, :], part_features)
+            assert_frame_equal(
+                all_features.loc[part_features.index, :], part_features
+            )
             is None
         )

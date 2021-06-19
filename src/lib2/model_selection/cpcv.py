@@ -22,7 +22,8 @@ class CPCV:
         indices = list(set(X.index))
 
         fold_bounds = [
-            (fold.index[0], fold.index[-1]) for fold in np.array_split(X, self.n_folds)
+            (fold.index[0], fold.index[-1])
+            for fold in np.array_split(X, self.n_folds)
         ]
 
         # Generate list of (start_test_dt, end_test_dt) for test data
@@ -49,7 +50,7 @@ class CPCV:
         for test_fold_bound in test_folds_bound:
 
             test_indices = np.union1d(
-                test_indices, indices[test_fold_bound[0] : test_fold_bound[-1]]
+                test_indices, indices[test_fold_bound[0]: test_fold_bound[-1]]
             ).astype(int)
 
         return test_indices

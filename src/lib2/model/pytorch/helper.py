@@ -35,10 +35,19 @@ def split_sequences_chart(df: pd.DataFrame, lookback_window: int):
                 # check if we are beyond the dataset
                 if i + lookback_window <= len(df_symbol):
 
-                    X.append(df_symbol.iloc[i : i + lookback_window, :-1].T.values)
-                    y.append(df_symbol.iloc[i : i + lookback_window, -1].values[-1])
+                    X.append(
+                        df_symbol.iloc[i: i + lookback_window, :-1].T.values
+                    )
+                    y.append(
+                        df_symbol.iloc[i: i + lookback_window, -1].values[-1]
+                    )
                     indices.append(
-                        [df_symbol.iloc[i : i + lookback_window, -1].index[-1], symbol]
+                        [
+                            df_symbol.iloc[i: i + lookback_window, -1].index[
+                                -1
+                            ],
+                            symbol,
+                        ]
                     )
 
     else:
@@ -51,9 +60,16 @@ def split_sequences_chart(df: pd.DataFrame, lookback_window: int):
                 # check if we are beyond the dataset
                 if i + lookback_window <= len(df_symbol):
 
-                    X.append(df_symbol.iloc[i : i + lookback_window, :].T.values)
+                    X.append(
+                        df_symbol.iloc[i: i + lookback_window, :].T.values
+                    )
                     indices.append(
-                        [df_symbol.iloc[i : i + lookback_window, -1].index[-1], symbol]
+                        [
+                            df_symbol.iloc[i: i + lookback_window, -1].index[
+                                -1
+                            ],
+                            symbol,
+                        ]
                     )
 
     return np.array(X), np.array(y), indices
