@@ -50,9 +50,7 @@ def add_all_ta_without_leak(
     )
     features = features.loc[:, ~deny_cols]
 
-    return features.loc[
-        :, features.columns[features.isnull().sum() >= max_nan]
-    ]
+    return features.loc[:, features.columns[features.isnull().sum() >= max_nan]]
 
 
 @dataclass(frozen=True)
@@ -85,13 +83,10 @@ class All_Technicals(Compute):
 
         # Normalization and Treatment for extreme value
         normed_features = features.apply(
-            lambda x: (x.rolling(self.window).mean() - x)
-            / x.rolling(self.window).std()
+            lambda x: (x.rolling(self.window).mean() - x) / x.rolling(self.window).std()
         )
         normed_features = normed_features.apply(
-            lambda x: x.clip(
-                x.quantile(self.quantile), x.quantile(1 - self.quantile)
-            )
+            lambda x: x.clip(x.quantile(self.quantile), x.quantile(1 - self.quantile))
         )
 
         return normed_features
@@ -126,8 +121,7 @@ class AllTechnicals_WithVol(Compute):
         if self.normalize:
 
             zscored_features = features.apply(
-                lambda x: (x.mean() - x)
-                / (x.quantile(0.75) - x.quantile(0.25))
+                lambda x: (x.mean() - x) / (x.quantile(0.75) - x.quantile(0.25))
             )
             features = zscored_features.apply(
                 lambda x: x.clip(
@@ -170,9 +164,7 @@ class MADiv(Compute):
     base: Compute = field(default=Close())
 
     def __post_init__(self):
-        object.__setattr__(
-            self, "name", f"MADiv({str(self.base.name)}, {self.window})"
-        )
+        object.__setattr__(self, "name", f"MADiv({str(self.base.name)}, {self.window})")
 
     def inputs(self, dfmeta):
         return self.base.compute(dfmeta)
@@ -274,9 +266,7 @@ class VWAP(Compute):
     base: Compute = field(default=Close())
 
     def __post_init__(self):
-        object.__setattr__(
-            self, "name", f"VWAP({str(self.base.name)}, {self.window})"
-        )
+        object.__setattr__(self, "name", f"VWAP({str(self.base.name)}, {self.window})")
 
     def inputs(self, dfmeta):
         return self.base.compute(dfmeta), Volume().compute(dfmeta)
@@ -288,9 +278,7 @@ class VWAP(Compute):
         price: pd.Series = inputs[0]
         volume: pd.Series = inputs[1]
 
-        trading_price = (
-            (price * volume).rolling(self.window, min_periods=1).sum()
-        )
+        trading_price = (price * volume).rolling(self.window, min_periods=1).sum()
 
         vwap = trading_price / volume.rolling(self.window, min_periods=1).sum()
 

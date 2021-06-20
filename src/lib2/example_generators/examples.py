@@ -14,6 +14,7 @@ from .helper import CURRENT
 def generate_raw_examples(
     features: pd.DataFrame,
     label: pd.Series,
+    hash_value: str,
 ) -> pd.DataFrame:
 
     logger = prefect.context.get("logger")

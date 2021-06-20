@@ -13,12 +13,12 @@ class Compute(metaclass=abc.ABCMeta):
             object.__setattr__(self, "name", self.__class__.__name__)
 
     @abc.abstractmethod
-    def inputs(self, dfmap):
+    def inputs(self, dsmeta):
         # Define imputs for this computation.
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def compute(self, dfmap):
+    def compute(self, dsmeta):
         # Computing based on the inputs.
         raise NotImplementedError()
 
@@ -33,11 +33,11 @@ class ComputePipe(metaclass=abc.ABCMeta):
             object.__setattr__(self, "name", self.__class__.__name__)
 
     @abc.abstractmethod
-    def inputs(self, dsmap: tuple):
+    def inputs(self, dsmeta: tuple):
         # Define imputs for this computation.
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def compute(self, dsmap: tuple):
+    def compute(self, dsmeta: tuple):
         # Computing based on the inputs.
         raise NotImplementedError()

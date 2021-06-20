@@ -17,9 +17,7 @@ class Reader(Task):
         self.result = result
         self.checkpoint = False
 
-    def run(
-        self, keys: Union[Dict[str, str], str]
-    ) -> Tuple[pd.DataFrame, Any]:
+    def run(self, keys: Union[Dict[str, str], str]) -> Tuple[pd.DataFrame, Any]:
         """
         Args:
             keys (Dict[str, str]): meta data for target symbol.

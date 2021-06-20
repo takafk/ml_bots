@@ -20,9 +20,7 @@ def spread_return_sharpe_ratio(
         lambda x: pd.cut(x, q_class, labels=False)
     )
 
-    quantile_return = (
-        y_true.groupby([y_true.index, quantile_pred]).mean().unstack()
-    )
+    quantile_return = y_true.groupby([y_true.index, quantile_pred]).mean().unstack()
 
     long_return = quantile_return[q_class - 1] - cost
     short_return = -quantile_return[0] - cost
@@ -41,9 +39,7 @@ def spread_return_sharpe_ratio(
     return metrics
 
 
-def compute_metrics(
-    y_true: pd.Series, y_pred: pd.Series, q_class: int, cost: float
-):
+def compute_metrics(y_true: pd.Series, y_pred: pd.Series, q_class: int, cost: float):
 
     metrics = spread_return_sharpe_ratio(y_true, y_pred, q_class, cost)
     metrics["ic"] = ic(y_true, y_pred)

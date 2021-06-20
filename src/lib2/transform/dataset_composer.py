@@ -19,16 +19,16 @@ class DatastoreComposer:
         path(str): path to read pickle data.
         symbols(List[str]): list of symbols used for composing this datastore.
         data_names(List[str]): list of data names such as ohlc and lsratio.
-        start_dt(str): start date/
-        end_dt(str): end date.
+        query_start_dt(str): start date/
+        query_end_dt(str): end date.
     Returns:
     """
 
     path: str
     symbols: list = field(default_factory=List[str])
     data_names: list = field(default_factory=List[str])
-    start_dt: str = field(default_factory=str)
-    end_dt: str = field(default_factory=str)
+    query_start_dt: str = field(default_factory=str)
+    query_end_dt: str = field(default_factory=str)
 
     def compose_data(self, path: str, symbols: List[str], data_name: str):
 
@@ -42,7 +42,7 @@ class DatastoreComposer:
                 df = pickle.load(f)
 
             df.index.name = "timestamp"
-            df = df[(df.index >= self.start_dt) & (df.index <= self.end_dt)]
+            df = df[(df.index >= self.query_start_dt) & (df.index <= self.query_end_dt)]
 
             df["symbol"] = symbol
             result.append(df)
@@ -55,9 +55,7 @@ class DatastoreComposer:
 
     def write_hdf5_bycolumn(self, path: str, df: pd.DataFrame):
         for col in df.columns:
-            df.loc[:, col].unstack().to_hdf(
-                f"{path}/datastore.h5", key=col, mode="a"
-            )
+            df.loc[:, col].unstack().to_hdf(f"{path}/datastore.h5", key=col, mode="a")
 
     def compose_datastore(self):
 

@@ -152,9 +152,7 @@ def cross_val_partial_predict(
 
     # We clone the estimator to make sure that all the folds are
     # independent, and that it is pickle-able.
-    parallel = Parallel(
-        n_jobs=n_jobs, verbose=verbose, pre_dispatch=pre_dispatch
-    )
+    parallel = Parallel(n_jobs=n_jobs, verbose=verbose, pre_dispatch=pre_dispatch)
     prediction_blocks = parallel(
         delayed(fit_and_predict)(
             clone(estimator), X, y, train, test, verbose, fit_params, method
@@ -213,9 +211,7 @@ def cross_val_metrics_multindex(
         val_y_true: pd.Series = y_true[val_indice]
 
         metrics.append(
-            compute_metrics(
-                val_y_true, val_y_pred_series, q_class=q_class, cost=cost
-            )
+            compute_metrics(val_y_true, val_y_pred_series, q_class=q_class, cost=cost)
         )
 
     return metrics

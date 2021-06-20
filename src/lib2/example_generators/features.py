@@ -112,8 +112,6 @@ def _cat_to_num(x: pd.Series) -> pd.Series:
     le = LabelEncoder()
     le = le.fit(x_notnull.values)
 
-    cat_series_transformed = pd.Series(
-        data=le.transform(x_notnull), index=index
-    )
+    cat_series_transformed = pd.Series(data=le.transform(x_notnull), index=index)
 
     return cat_series_transformed.reindex(index_org)
