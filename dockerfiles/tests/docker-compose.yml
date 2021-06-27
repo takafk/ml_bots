@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  jupyterlab:
+    build: .
+    user: root
+    env_file:
+      - .env
+    cache_from:
+      - $IMAGE_ID:latest
+    container_name: ml_bots_base
+    env_file:
+      - .env
+    ports:
+      - "8888:8888" # Port for jupyterlab.
+      - "8501:8501" # Port for streamlit.
+      - "5000:5000" # Port for mlflow.
+    working_dir: /home/$NB_USER
