@@ -26,7 +26,7 @@ jobs:
           COMPOSE_DOCKER_CLI_BUILD: 1
         run: |
           echo $IMAGE_ID >> ./dockerfiles/tests/.env
-          docker-compose --file docker-compose.test.yml build
+          docker-compose --file ./dockerfiles/docker-compose.test.yml build
       - name: Test with pytest
         run: |
           docker-compose exec -T python pytest
