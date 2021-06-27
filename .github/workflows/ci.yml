@@ -18,13 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build docker image
-        run: |
-          if [ -f docker-compose.test.yml ]; then
-            docker-compose --file docker-compose.test.yml build
-            docker-compose --file docker-compose.test.yml run sut
-          else
-            docker build . --file Dockerfile
-          fi
+        run: docker build --file ./dockerfiles/Dockerfile
   # imageをpushする
   push:
     # test jobが成功した場合のみトリガーされる
