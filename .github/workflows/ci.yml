@@ -11,6 +11,7 @@ on:
 env:
   # image name
   IMAGE_NAME: ml_bots_base
+  IMAGE_ID: ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
 jobs:
   # RUN UNIT TESTS
   unittest:
@@ -22,11 +23,11 @@ jobs:
       - name: Build docker image
         env:
           DOCKER_BUILDKIT: 1
-          IMAGE_ID: ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-          DOCKERHUB_PASS: ${{ secrets.DOCKER_PASSWORD }}
         run: docker build . --file ./dockerfiles/tests/Dockerfile --cache-from=$IMAGE_ID:latest
       - name: Test with pytest
-        run: pytest ./src/tests
+        run: |
+          docker exec -i -t ml_bots_base bash
+          pytest ./work/src/tests
   # PUSH IMAGE
   push:
     # Trigger when unit tests are completed.
@@ -39,7 +40,7 @@ jobs:
       - name: Build docker image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME
       - name: Log into GitHub Container Registry
-        run: echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Push image to GitHub Container Registry
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
