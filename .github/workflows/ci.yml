@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build docker image
-        run: docker build --file ./dockerfiles/Dockerfile
+        run: docker build . --file ./dockerfiles/Dockerfile
   # imageをpushする
   push:
     # test jobが成功した場合のみトリガーされる
