@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  jupyterlab:
+    build:
+      context: ../
+      cache_from:
+        - $IMAGE_ID:latest
+    user: root
+    env_file:
+      - .env
+    container_name: ml_bots_base
+    working_dir: /home/$NB_USER

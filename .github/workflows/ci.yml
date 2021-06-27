@@ -23,11 +23,10 @@ jobs:
       - name: Build docker image
         env:
           DOCKER_BUILDKIT: 1
+          COMPOSE_DOCKER_CLI_BUILD: 1
         run: |
-          cp ./dockerfiles/.env ./dockerfiles/tests/
           echo $IMAGE_ID >> ./dockerfiles/tests/.env
-          cd ./dockerfiles/tests
-          docker-compose up -d
+          docker-compose --file docker-compose.test.yml build
       - name: Test with pytest
         run: |
           docker-compose exec -T python pytest
