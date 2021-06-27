@@ -34,3 +34,6 @@ hiplot
 # For Deployment
 fastapi
 uvicorn
+# For Google Drive
+google-api-python-client
+oauth2client
