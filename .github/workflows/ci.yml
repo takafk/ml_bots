@@ -28,7 +28,7 @@ jobs:
   # imageをpushする
   push:
     # test jobが成功した場合のみトリガーされる
-    needs: test
+    needs: unittest
     runs-on: ubuntu-latest
     # pushイベント以外(PRなど)では実行されない
     if: github.event_name == 'push'
