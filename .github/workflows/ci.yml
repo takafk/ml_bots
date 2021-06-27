@@ -12,23 +12,31 @@ env:
   # image name
   IMAGE_NAME: ml_bots_base
 jobs:
-  # unit test
+  # RUN UNIT TESTS
   unittest:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Log into GitHub Container Registry
+        run: echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Build docker image
-        run: docker build . --file ./dockerfiles/Dockerfile
-  # imageをpushする
+        env:
+          DOCKER_BUILDKIT: 1
+          IMAGE_ID: ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+          DOCKERHUB_PASS: ${{ secrets.DOCKER_PASSWORD }}
+        run: docker build . --file ./dockerfiles/tests/Dockerfile --cache-from=$IMAGE_ID:latest
+      - name: Test with pytest
+        run: pytest ./src/tests
+  # PUSH IMAGE
   push:
-    # test jobが成功した場合のみトリガーされる
+    # Trigger when unit tests are completed.
     needs: unittest
     runs-on: ubuntu-latest
     # pushイベント以外(PRなど)では実行されない
     if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v2
-      - name: Build image
+      - name: Build docker image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME
       - name: Log into GitHub Container Registry
         run: echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
