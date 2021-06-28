@@ -30,7 +30,8 @@ jobs:
       - name: Test with pytest
         run: |
           docker images
-          docker-compose exec -T $IMAGE_NAME pytest
+          docker-compose exec $IMAGE_NAME bash
+          pytest ./work/src/tests
   # PUSH IMAGE
   push:
     # Trigger when unit tests are completed.
