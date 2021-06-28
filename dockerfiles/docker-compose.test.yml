@@ -7,7 +7,9 @@ services:
       cache_from:
         - $IMAGE_ID:latest
     user: root
+    container_name: ml_bots_base
     env_file:
       - .env
-    container_name: ml_bots_base
+    volumes:
+      - ~/ml_bots:/home/$NB_USER
     working_dir: /home/$NB_USER
