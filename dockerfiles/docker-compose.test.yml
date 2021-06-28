@@ -11,5 +11,5 @@ services:
     env_file:
       - .env
     volumes:
-      - ~/ml_bots:/home/$NB_USER
+      - ~/:/home/$NB_USER
     working_dir: /home/$NB_USER
