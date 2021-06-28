@@ -9,8 +9,8 @@ on:
     tags:
       - v*
 env:
-  # image name
-  IMAGE_NAME: ml_bots_base
+  # Image name
+  CONTAINER_NAME: ml_bots_base
   IMAGE_ID: ghcr.io/${{ github.repository_owner }}/ml_bots_base
 jobs:
   # RUN UNIT TESTS
@@ -32,8 +32,8 @@ jobs:
 
       - name: Test with pytest
         run: |
-          docker exec $IMAGE_NAME ls
-          docker exec $IMAGE_NAME pytest ./src/tests
+          docker exec $CONTAINER_NAME ls
+          docker exec $CONTAINER_NAME pytest ./src/tests
   # PUSH IMAGE
   push:
     # Trigger when unit tests are completed.
@@ -42,7 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build image
+      - name: Build docker image
         run: docker-compose --file ./dockerfiles/docker-compose.yml up -d
 
       - name: Login to GitHub Container Registry
@@ -52,15 +52,17 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
 
-      - name: Build container image for master branch.
+      - name: Push image of master branch to GitHub Container Registry
         if: "contains( github.ref , 'master')"
         run: |
-          docker tag $IMAGE_NAME $IMAGE_ID:latest
+          CUR_IMAGE_ID=docker ps -aqf "name=$CONTAINER_NAME"
+          docker tag $CUR_IMAGE_ID $IMAGE_ID:latest
           docker push $IMAGE_ID:latest
 
-      - name: Build container image for feature branch.
+      - name: Push image of develop or feature branch to GitHub Container Registry
         if: "!contains( github.ref , 'master')"
         run: |
-          docker tag $IMAGE_NAME $IMAGE_ID:${{ github.sha }}
+          CUR_IMAGE_ID=docker ps -aqf "name=$CONTAINER_NAME"
+          docker tag $CUR_IMAGE_ID $IMAGE_ID:${{ github.sha }}
           docker push $IMAGE_ID:${{ github.sha }}
 
