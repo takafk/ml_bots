@@ -53,20 +53,14 @@ jobs:
           password: ${{ secrets.CR_PAT }}
 
       - name: Build container image for master branch.
-        uses: docker/build-push-action@v2
         if: "contains( github.ref , 'master')"
-        with:
-          context: .
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+        run: |
+          docker tag $IMAGE_NAME $IMAGE_ID:latest
+          docker push $IMAGE_ID:latest
 
       - name: Build container image for feature branch.
-        uses: docker/build-push-action@v2
         if: "!contains( github.ref , 'master')"
-        with:
-          context: .
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        run: |
+          docker tag $IMAGE_NAME $IMAGE_ID:${{ github.sha }}
+          docker push $IMAGE_ID:${{ github.sha }}
 
