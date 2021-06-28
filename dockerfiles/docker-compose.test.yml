@@ -11,5 +11,6 @@ services:
     env_file:
       - .env
     volumes:
-      - ./:/home/$NB_USER
+      # Relative path from the path where this YAML file exists (ml_bots/dockerfiles)
+      - ../:/home/$NB_USER
     working_dir: /home/$NB_USER
