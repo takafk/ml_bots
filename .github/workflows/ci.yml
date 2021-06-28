@@ -29,7 +29,8 @@ jobs:
           docker-compose --file ./dockerfiles/docker-compose.test.yml up -d
       - name: Test with pytest
         run: |
-          docker exec $IMAGE_NAME pytest ./src/tests
+          docker exec $IMAGE_NAME pwd
+          docker exec $IMAGE_NAME pytest ./work/src/tests
   # PUSH IMAGE
   push:
     # Trigger when unit tests are completed.
