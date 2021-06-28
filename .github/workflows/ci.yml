@@ -36,15 +36,23 @@ jobs:
     # Trigger when unit tests are completed.
     needs: unittest
     runs-on: ubuntu-latest
-    # pushイベント以外(PRなど)では実行されない
-    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v2
-      - name: Push to GitHub Container Registry
-        uses: docker/build-push-action@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
         with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
           registry: ghcr.io
-          repository: ${{ github.repository_owner }}/$IMAGE_NAME
-          tag_with_ref: true
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+      - name: Push image to GitHub Container Registry
+        run: |
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # git tagの値を<タグ>として付与
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # masterブランチへのcommitでトリガーされている場合はlatestを<タグ>として使う
+          [ "$VERSION" == "master" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
