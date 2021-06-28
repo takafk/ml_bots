@@ -56,14 +56,14 @@ jobs:
         if: "contains( github.ref , 'master')"
         # Store the container ID with ``(back quart).
         run: |
-          CUR_IMAGE_ID=`docker ps -aqf "name=$IMAGE_NAME"`
-          docker tag $CUR_IMAGE_ID $IMAGE_ID:latest
+          CURIMAGE_ID=`docker ps -aqf "name=$IMAGE_NAME"`
+          docker tag $CURIMAGE_ID $IMAGE_ID:latest
           docker push $IMAGE_ID:latest
 
       - name: Push image of develop or feature branch to GitHub Container Registry
         if: "!contains( github.ref , 'master')"
         run: |
-          CUR_IMAGE_ID=`docker ps -aqf "name=$IMAGE_NAME"`
-          docker tag $CUR_IMAGE_ID $IMAGE_ID:${{ github.sha }}
+          CURIMAGE_ID=`docker ps -aqf "name=$IMAGE_NAME"`
+          docker tag $CURIMAGE_ID $IMAGE_ID:${{ github.sha }}
           docker push $IMAGE_ID:${{ github.sha }}
 
