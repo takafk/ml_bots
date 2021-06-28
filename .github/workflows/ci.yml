@@ -10,7 +10,7 @@ on:
       - v*
 env:
   # Image name
-  CONTAINER_NAME: ml_bots_base
+  IMAGE_NAME: ml_bots_base
   IMAGE_ID: ghcr.io/${{ github.repository_owner }}/ml_bots_base
 jobs:
   # RUN UNIT TESTS
@@ -32,8 +32,8 @@ jobs:
 
       - name: Test with pytest
         run: |
-          docker exec $CONTAINER_NAME ls
-          docker exec $CONTAINER_NAME pytest ./src/tests
+          docker exec $IMAGE_NAME ls
+          docker exec $IMAGE_NAME pytest ./src/tests
   # PUSH IMAGE
   push:
     # Trigger when unit tests are completed.
@@ -54,15 +54,16 @@ jobs:
 
       - name: Push image of master branch to GitHub Container Registry
         if: "contains( github.ref , 'master')"
+        # Store the container ID with ``(back quart).
         run: |
-          CUR_IMAGE_ID=docker ps -aqf "name=$CONTAINER_NAME"
+          CUR_IMAGE_ID=`docker ps -aqf "name=$IMAGE_NAME"`
           docker tag $CUR_IMAGE_ID $IMAGE_ID:latest
           docker push $IMAGE_ID:latest
 
       - name: Push image of develop or feature branch to GitHub Container Registry
         if: "!contains( github.ref , 'master')"
         run: |
-          CUR_IMAGE_ID=docker ps -aqf "name=$CONTAINER_NAME"
+          CUR_IMAGE_ID=`docker ps -aqf "name=$IMAGE_NAME"`
           docker tag $CUR_IMAGE_ID $IMAGE_ID:${{ github.sha }}
           docker push $IMAGE_ID:${{ github.sha }}
 
