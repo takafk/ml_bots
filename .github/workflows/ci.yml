@@ -11,6 +11,7 @@ on:
 env:
   # image name
   IMAGE_NAME: ml_bots_base
+  IMAGE_ID: ghcr.io/${{ github.repository_owner }}/ml_bots_base
 jobs:
   # RUN UNIT TESTS
   unittest:
@@ -25,7 +26,6 @@ jobs:
         env:
           DOCKER_BUILDKIT: 1
           COMPOSE_DOCKER_CLI_BUILD: 1
-          IMAGE_ID: ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
         run: |
           echo $IMAGE_ID >> ./dockerfiles/.env
           docker-compose --file ./dockerfiles/docker-compose.test.yml up -d
@@ -53,16 +53,12 @@ jobs:
           password: ${{ secrets.CR_PAT }}
 
       - name: Build container image for master branch.
-        env:
-          IMAGE_ID: ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
         if: "contains( github.ref , 'master')"
         run: |
           docker tag $IMAGE_NAME $IMAGE_ID:latest
           docker push $IMAGE_ID:latest
 
       - name: Build container image for feature branch.
-        env:
-          IMAGE_ID: ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
         if: "!contains( github.ref , 'master')"
         run: |
           docker tag $IMAGE_NAME $IMAGE_ID:${{ github.sha }}
