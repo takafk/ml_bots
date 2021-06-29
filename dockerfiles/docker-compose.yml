@@ -3,7 +3,10 @@ services:
   jupyterlab:
     build: .
     user: root
-    container_name: ml_bots_base
+    # Image name.
+    image: ml_bots_base
+    # Contaniner name
+    container_name: ml_bots
     env_file:
       - .env
     #environment:
