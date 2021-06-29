@@ -57,7 +57,10 @@ jobs:
         # Store the container ID with ``(back quart).
         run: |
           CURIMAGE_ID=`docker ps -aqf "name=$IMAGE_NAME"`
+          echo $CURIMAGE_ID
+          docker images
           docker tag $CURIMAGE_ID $IMAGE_ID:latest
+          docker images
           docker push $IMAGE_ID:latest
 
       - name: Push image of develop or feature branch to GitHub Container Registry
