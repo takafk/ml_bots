@@ -14,7 +14,7 @@ services:
       - "8501:8501" # Port for streamlit.
       - "5000:5000" # Port for mlflow.
     volumes:
-      - ~/ml_bots:/home/$NB_USER/work
+      - ../:/home/$NB_USER/work
     working_dir: /home/$NB_USER/work
     networks:
       - local_network
