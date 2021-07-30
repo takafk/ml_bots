@@ -10,4 +10,4 @@ rm:
 
 # Enter in the container
 note:
-	@docker exec -i -t ml_bots_base bash
+	@docker exec -i -t ml_bots bash
