@@ -27,7 +27,7 @@ torchvision
 optuna
 lightgbm
 # Jupyter notebook
-jupyterlab==2.2.9
+jupyterlab==2.2.10
 nb_black
 # Display
 streamlit #(to use this, we need to use python 3.7.
